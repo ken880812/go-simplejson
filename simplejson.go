@@ -1,6 +1,7 @@
 package simplejson
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"log"
@@ -50,7 +51,15 @@ func (j *Json) EncodePretty() ([]byte, error) {
 
 // Implements the json.Marshaler interface.
 func (j *Json) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&j.data)
+	////// https://stackoverflow.com/questions/28595664/how-to-stop-json-marshal-from-escaping-and/28596225#28596225
+	// Do Not Escape HTML
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(&j.data)
+	return buffer.Bytes(), err
+	//////
+	//return json.Marshal(&j.data)
 }
 
 // Set modifies `Json` map by `key` and `value`
